@@ -1,11 +1,9 @@
 Python standalone version adapted from `google-gemini/gemma-cookbook` notebook
 for Gemma 3n model.
 
-On Apple Silicon with 16GB unified memory there can be memory allocation issues.
-Observed on MacBook Air M3 16GB.
-
 - [1. Installation](#1-installation)
 - [2. Run script](#2-run-script)
+  - [macOS with 16GB RAM =\> can fail](#macos-with-16gb-ram--can-fail)
   - [Shopping buddy result](#shopping-buddy-result)
   - [Journal enhancer result](#journal-enhancer-result)
   - [Time took](#time-took)
@@ -13,7 +11,16 @@ Observed on MacBook Air M3 16GB.
 
 ## 1. Installation
 
-Tested on Apple Silicon (MacBook Air M3 16GB) running macOS Sequoia 15.7
+Tested on
+* Ubuntu:
+  * Intel x86_64 (Xeon W-2223 CPU 48GB) running Ubuntu 24.04 => **OK**.
+  * GPU: (NVidia RTX-2080Ti 11GB) failed due to out of memory => **NOK**.
+  * multi-GPU: (NVidia RTX-2080Ti 11GB + NVidia RTX-A2000 6GB) failed due to `Expected all tensors to be on the same device` => **NOK**.
+* macOS:
+  * Apple Silicon (MacBook Air M3 16GB) running macOS Sequoia 15.7 has occasional allocation runtime fail => **NOK**.
+
+Target at least 18GB of free memory for this script to run in bfloat16
+precision, or 30GB for float32 precision.
 
 1. Get an access token from your HuggingFace account
 Needed for model loading.  Paste it to this command.
@@ -21,12 +28,12 @@ Needed for model loading.  Paste it to this command.
 HF_TOKEN=<your token>
 ```
 
-2. Clone this repo.
+1. Clone this repo.
 ```bash
 git clone git@github.com:guynich/raudio_understanding.git
 ```
 
-3. Install dependencies
+1. Install dependencies
 
 Create a Python environment and activate it.
 ```bash
@@ -56,6 +63,11 @@ cd audio_understanding
 
 python3 main.py --hf_token=${HF_TOKEN}
 ```
+
+Add `--device-map="cpu" --dtype="float32"` option for Ubuntu on Intel x86_64 (
+Xeon W-2223 lacks native support for avx512_bf16, e.g.: bfloat16).
+
+### macOS with 16GB RAM => can fail
 
 On macOS Apple Silicon (M3 16GB RAM) memory allocation can fail with this kind
 of error.
@@ -119,13 +131,24 @@ The audio features a person reflecting on their day. They describe feeling refre
 > `The audio seems to contain a stream of random characters and words,` ...
 
 ### Time took
-MacBook Air M3 (16GB)
+
+*  Intel x86_64 (Xeon W-2223 CPU 48GB) running Ubuntu 24.04
+```bash
+python3 main.py --hf_token=${HF_TOKEN} --device-map="cpu" --dtype="float32"
+```
+```console
+Took: 90.68 seconds
+```
+
+* MacBook Air M3 (16GB) - sometimes allocation error.  This run was successful.
+```bash
+python3 main.py --hf_token=${HF_TOKEN}
+```
 ```console
 Took: 1629.95 seconds
 ```
 
-> The huggingface cache has 11GB for `gemma-3n-E2B-it`.  Suspect out of physical
-> memory:
+> The huggingface cache has 11GB for `gemma-3n-E2B-it`.
 > `Some parameters are on the meta device because they were offloaded to the disk.`
 > Using `Activity Monitor` the Python 3.12 process is using ~5GB.
 >

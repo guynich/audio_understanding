@@ -19,6 +19,7 @@ Application tasks include audio understanding.
 # limitations under the License.
 
 import argparse
+import sys
 import time
 
 import torch
@@ -28,8 +29,9 @@ from transformers import AutoModelForImageTextToText, AutoProcessor
 GEMMA_PATH = "google/gemma-3n-E2B-it"  # @param ["google/gemma-3n-E2B-it", "google/gemma-3n-E4B-it"]
 RESOURCE_URL_PREFIX = "https://raw.githubusercontent.com/google-gemini/gemma-cookbook/refs/heads/main/Demos/sample-data/"
 
-print("MPS available:", torch.backends.mps.is_available())
-print("MPS built:", torch.backends.mps.is_built())
+if sys.platform == "darwin":
+    print("MPS available:", torch.backends.mps.is_available())
+    print("MPS built:", torch.backends.mps.is_built())
 
 
 class ChatState:
@@ -71,7 +73,7 @@ class ChatState:
         # display chat
         for item in message["content"]:
             if item["type"] == "text":
-                 print(f"user:\n{item['text']}")
+                print(f"user:\n{item['text']}")
             elif item["type"] == "audio":
                 print(f"user audio: {item['audio'].rsplit('/', 1)[-1]}")
             elif item["type"] == "image":
@@ -82,6 +84,10 @@ class ChatState:
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--device_map", default="auto", choices=["auto", "cpu", "cuda", "mps"]
+    )
+    parser.add_argument("--dtype", default="auto", choices=["auto", "float32"])
     parser.add_argument("--hf_token", required=True)
     return parser.parse_args()
 
@@ -93,7 +99,9 @@ def main():
 
     processor = AutoProcessor.from_pretrained(GEMMA_PATH)
     model = AutoModelForImageTextToText.from_pretrained(
-        GEMMA_PATH, dtype="auto", device_map="auto",
+        GEMMA_PATH,
+        dtype=args.dtype,
+        device_map=args.device_map,
     )
 
     print(f"Device: {model.device}")
@@ -127,7 +135,7 @@ def main():
     ]
 
     chat.history = []
-    print(f"{'-'*40}")
+    print(f"{'-' * 40}")
     chat.send_message(messages[0])
     chat.send_message(messages[1])
     chat.send_message(messages[2])
@@ -142,11 +150,11 @@ def main():
             {"type": "audio", "audio": f"{RESOURCE_URL_PREFIX}journal4.wav"},
             {"type": "audio", "audio": f"{RESOURCE_URL_PREFIX}journal5.wav"},
             {"type": "text", "text": "Give me a concise overview of these audio."},
-        ]
+        ],
     }
 
     chat.history = []
-    print(f"{'-'*40}")
+    print(f"{'-' * 40}")
     chat.send_message(prompt)
 
     # TODO: speech recognition and speech translation examples.
