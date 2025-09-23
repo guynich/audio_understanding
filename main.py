@@ -1,6 +1,8 @@
 """
 Example script to run Gemma 3n instruction tuned model from HuggingFace.
 
+Memory allocation is fragile on Apple Silicon with 16GB RAM.
+
 Application tasks include audio understanding.
 """
 
@@ -91,7 +93,7 @@ def main():
 
     processor = AutoProcessor.from_pretrained(GEMMA_PATH)
     model = AutoModelForImageTextToText.from_pretrained(
-        GEMMA_PATH, dtype="auto", device_map="auto"
+        GEMMA_PATH, dtype="auto", device_map="auto",
     )
 
     print(f"Device: {model.device}")

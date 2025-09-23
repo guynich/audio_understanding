@@ -1,6 +1,9 @@
 Python standalone version adapted from `google-gemini/gemma-cookbook` notebook
 for Gemma 3n model.
 
+On Apple Silicon with 16GB unified memory there can be memory allocation issues.
+Observed on MacBook Air M3 16GB.
+
 - [1. Installation](#1-installation)
 - [2. Run script](#2-run-script)
   - [Shopping buddy result](#shopping-buddy-result)
@@ -54,11 +57,12 @@ cd audio_understanding
 python3 main.py --hf_token=${HF_TOKEN}
 ```
 
-On macOS Apple Silicon (M3) memory allocation can fail with this error.
+On macOS Apple Silicon (M3 16GB RAM) memory allocation can fail with this kind
+of error.
 ```console
 RuntimeError: Invalid buffer size: 9.10 GiB
 ```
-The wrapper script `run.sh` mitigates this failure.
+The wrapper script `run.sh` *tries* to mitigate this failure.
 ```bash
 cd
 cd audio_understanding
@@ -68,29 +72,41 @@ run.sh --hf_token=${HF_TOKEN}
 ```
 
 ### Shopping buddy result
+
 ```console
+----------------------------------------
+user:
+itemize it into a shopping list.
+user audio: shopping1.wav
+
+assistant:
 Here's your shopping list:
 
-* Milk (1)
-* Apples (3)
-* Tofu (1)
-```
-```console
-Here's your updated shopping list:
+* 1 milk
+* 3 apples
+* 1 tofu
+
+user audio: shopping2.wav
+
+assistant:
+Here's the updated shopping list:
 
 * 1 milk
 * 4 bananas
 * 1 tofu
-```
-```console
-Here's your updated shopping list:
+
+user audio: shopping3.wav
+
+assistant:
+Here's the updated shopping list:
 
 * 1 milk
 * 4 bananas
 * 1 tofu
 * 1 dozen eggs
 ```
-> I saw `donuts` instead of `dozen eggs` in one run.
+
+> Note: in another run I saw `donuts` instead of `dozen eggs`.
 
 ### Journal enhancer result
 ```console
@@ -99,8 +115,8 @@ Give me a concise overview of these audio.
 The audio features a person reflecting on their day. They describe feeling refreshed in the morning, enjoying coffee, and spending time at the park. They also mention finishing the day with a good book and feeling grateful for simple moments. The speaker seems to have had a pleasant day and appreciates their old friends. They express contentment and relaxation at the end of the day.
 ```
 
-> I also saw `The audio seems to contain a stream of random characters and words,`
-> in another run.
+> I also saw another run return
+> `The audio seems to contain a stream of random characters and words,` ...
 
 ### Time took
 MacBook Air M3 (16GB)
@@ -112,6 +128,8 @@ Took: 1629.95 seconds
 > memory:
 > `Some parameters are on the meta device because they were offloaded to the disk.`
 > Using `Activity Monitor` the Python 3.12 process is using ~5GB.
+>
+> Closing other apps I saw `Took: 1230.94 seconds`.
 
 ## References
 
