@@ -45,12 +45,26 @@ python3 -m pip install -r requirements.txt
 ```
 
 ## 2. Run script
+
 ```bash
 cd
 source .venv_audio_understanding/bin/activate
 cd audio_understanding
 
 python3 main.py --hf_token=${HF_TOKEN}
+```
+
+On macOS Apple Silicon (M3) memory allocation can fail with this error.
+```console
+RuntimeError: Invalid buffer size: 9.10 GiB
+```
+The wrapper script `run.sh` mitigates this failure.
+```bash
+cd
+cd audio_understanding
+chmod +x ./run.sh
+
+run.sh --hf_token=${HF_TOKEN}
 ```
 
 ### Shopping buddy result
