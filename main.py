@@ -26,6 +26,9 @@ from transformers import AutoModelForImageTextToText, AutoProcessor
 GEMMA_PATH = "google/gemma-3n-E2B-it"  # @param ["google/gemma-3n-E2B-it", "google/gemma-3n-E4B-it"]
 RESOURCE_URL_PREFIX = "https://raw.githubusercontent.com/google-gemini/gemma-cookbook/refs/heads/main/Demos/sample-data/"
 
+print("MPS available:", torch.backends.mps.is_available())
+print("MPS built:", torch.backends.mps.is_built())
+
 
 class ChatState:
     def __init__(self, model, processor):
@@ -66,19 +69,13 @@ class ChatState:
         # display chat
         for item in message["content"]:
             if item["type"] == "text":
-                # formatted_prompt = "🙋‍♂️\n" + item['text'] + "\n"
-                # display(Markdown(formatted_prompt))
-                print(f"\n{item['text']}\n")
+                 print(f"user:\n{item['text']}")
             elif item["type"] == "audio":
-                # display(Audio(item['audio']))
-                 print(f"\n{item['audio']}\n")
+                print(f"user audio: {item['audio'].rsplit('/', 1)[-1]}")
             elif item["type"] == "image":
-                # display(Image(item['image']))
-                print(f"\n{item['image']}\n")
+                print(f"user video: {item['image'].rsplit('/', 1)[-1]}")
 
-        # formatted_text = "🤖\n" + text[0] + "\n"
-        # display(Markdown(formatted_text))
-        print(f"\n{text[0]}\n")
+        print(f"\nassistant:\n{text[0]}\n")
 
 
 def parse_args():
@@ -128,6 +125,7 @@ def main():
     ]
 
     chat.history = []
+    print(f"{'-'*40}")
     chat.send_message(messages[0])
     chat.send_message(messages[1])
     chat.send_message(messages[2])
@@ -146,12 +144,11 @@ def main():
     }
 
     chat.history = []
+    print(f"{'-'*40}")
     chat.send_message(prompt)
-
 
     # TODO: speech recognition and speech translation examples.
     chat.history = []
-
 
     print(f"Took: {time.time() - start_time:.2f} seconds")
 

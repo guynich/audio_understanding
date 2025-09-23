@@ -3,13 +3,14 @@ for Gemma 3n model.
 
 - [1. Installation](#1-installation)
 - [2. Run script](#2-run-script)
-  - [Shopping buddy](#shopping-buddy)
-  - [Journal enhancer](#journal-enhancer)
+  - [Shopping buddy result](#shopping-buddy-result)
+  - [Journal enhancer result](#journal-enhancer-result)
+  - [Time took](#time-took)
 - [References](#references)
 
 ## 1. Installation
 
-Tested on macOS Sequoia x86_64.
+Tested on Apple Silicon (MacBook Air M3 16GB) running macOS Sequoia 15.7
 
 1. Get an access token from your HuggingFace account
 Needed for model loading.  Paste it to this command.
@@ -52,57 +53,51 @@ cd audio_understanding
 python3 main.py --hf_token=${HF_TOKEN}
 ```
 
-Expected output from [notebook](https://github.com/google-gemini/gemma-cookbook/blob/main/Gemma/%5BGemma_3n%5DAudio_understanding_with_HF.ipynb).
-
-
-### Shopping buddy
-```bash
+### Shopping buddy result
+```console
 Here's your shopping list:
 
 * Milk (1)
 * Apples (3)
 * Tofu (1)
 ```
-
 ```console
-user:
-itemize it into a shopping list.
-shopping1.wav
---------------------------------------------------------------------------------
-assistant:
-Here's your shopping list:
-
-* 1 milk
-* 3 apples
-* 1 tofu
---------------------------------------------------------------------------------
-user:
-shopping2.wav
---------------------------------------------------------------------------------
-assistant:
-Here's the updated shopping list:
+Here's your updated shopping list:
 
 * 1 milk
 * 4 bananas
 * 1 tofu
---------------------------------------------------------------------------------
-user:
-shopping3.wav
---------------------------------------------------------------------------------
-assistant:
-Here's the updated shopping list:
+```
+```console
+Here's your updated shopping list:
 
 * 1 milk
 * 4 bananas
 * 1 tofu
 * 1 dozen eggs
---------------------------------------------------------------------------------
+```
+> I saw `donuts` instead of `dozen eggs` in one run.
+
+### Journal enhancer result
+```console
+Give me a concise overview of these audio.
+
+The audio features a person reflecting on their day. They describe feeling refreshed in the morning, enjoying coffee, and spending time at the park. They also mention finishing the day with a good book and feeling grateful for simple moments. The speaker seems to have had a pleasant day and appreciates their old friends. They express contentment and relaxation at the end of the day.
 ```
 
-### Journal enhancer
+> I also saw `The audio seems to contain a stream of random characters and words,`
+> in another run.
+
+### Time took
+MacBook Air M3 (16GB)
 ```console
-The audio snippets describe a pleasant day. The speaker mentions feeling refreshed in the morning with sunshine and coffee. They enjoyed an afternoon walk and saw beautiful views. The day ended with a good book and reflection on simple moments. The speaker expresses gratitude for a good day and reflects on enjoyable moments. They also mention a great lunch with an old friend and a satisfying evening.
+Took: 1629.95 seconds
 ```
+
+> The huggingface cache has 11GB for `gemma-3n-E2B-it`.  Suspect out of physical
+> memory:
+> `Some parameters are on the meta device because they were offloaded to the disk.`
+> Using `Activity Monitor` the Python 3.12 process is using ~5GB.
 
 ## References
 
